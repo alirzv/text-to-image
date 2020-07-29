@@ -60,7 +60,7 @@ public class TextToImageApp extends JFrame implements ActionListener {
         engFtSizeLabel.setBounds(10, y, 200, 30);
         engTextSizeBox = new JComboBox(fontSizesArray());
         engTextSizeBox.setBounds(210, y, 100, 30);
-        engTextSizeBox.setSelectedItem(40);
+        engTextSizeBox.setSelectedItem(35);
         frame.add(engTextSizeBox);
         frame.add(engFtSizeLabel);
 
@@ -69,7 +69,7 @@ public class TextToImageApp extends JFrame implements ActionListener {
         urduFtSizeLabel.setBounds(10, y, 200, 30);
         urduTextSizeBox = new JComboBox(fontSizesArray());
         urduTextSizeBox.setBounds(210, y, 100, 30);
-        urduTextSizeBox.setSelectedItem(60);
+        urduTextSizeBox.setSelectedItem(35);
         frame.add(urduFtSizeLabel);
         frame.add(urduTextSizeBox);
 
@@ -176,7 +176,7 @@ public class TextToImageApp extends JFrame implements ActionListener {
             JFileChooser j = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
             int r = j.showOpenDialog(null);
             fileLabel3.setText(j.getSelectedFile().getAbsolutePath());
-             headerImage = j.getSelectedFile().getAbsolutePath();
+            headerImage = j.getSelectedFile().getAbsolutePath();
             infoArea.setText("Select Values And Click Submit");
         } else if (e.getSource() == fileButton4) {
             JFileChooser j = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());

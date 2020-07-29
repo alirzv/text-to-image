@@ -4,14 +4,11 @@ import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.FileAttribute;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,6 +17,9 @@ import java.util.Map;
 
 public class TextToGraphicConverter {
 
+    public static final int CONSTANT_1080 = 1080;
+    public static final int CONSTANT_1280 = 1280;
+    private String actualFilename;
     private String URDU_FONT_NAME = "JameelNooriNastaleeq";
     private String ENGLISH_FONT_NAME = "Serif";
     private Color BACKGROUND_COLOR = new Color(68, 21, 46);
@@ -50,16 +50,28 @@ public class TextToGraphicConverter {
 
     public String createImages() throws Exception {
         List<List<String>> fileContentList = readData(fileName);
+        String folder = createFolder();
+
         for (List<String> lineList : fileContentList) {
-//            List<String> englist = lineList.subList(0, lineList.indexOf("%"));
-//            List<String> urdulist = lineList.subList(lineList.indexOf("%") + 1, lineList.size());
             String firstColumn = lineList.get(0);
-            if(firstColumn.equalsIgnoreCase("English") || firstColumn.equalsIgnoreCase("eng")){
-                String fileNameEng = "./image_" + fileContentList.indexOf(lineList) + "_english.png";
-                createEnglishImage(lineList, fileNameEng, FONT_SIZE_ENGLISH);
+            if(firstColumn.equalsIgnoreCase("English-urdu")){
+                String fileNameEng = folder + fileContentList.indexOf(lineList) + "_english-urdu.png";
+                createCombinedImage(lineList, fileNameEng, FONT_SIZE_ENGLISH, fileContentList.indexOf(lineList));
+            }else if(firstColumn.equalsIgnoreCase("English") || firstColumn.equalsIgnoreCase("eng")){
+                try {
+                    String fileNameEng = folder + fileContentList.indexOf(lineList) + "_english.png";
+                    ImageIO.write(createEnglishImage(lineList, FONT_SIZE_ENGLISH, CONSTANT_1080, CONSTANT_1080,true), "png", new File(fileNameEng));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }else if(firstColumn.equalsIgnoreCase("urdu") || firstColumn.equalsIgnoreCase("اردو")){
-                String fileNameUrdu = "./image_" + fileContentList.indexOf(lineList) + "_urdu.png";
-                createUrduImage(lineList, fileNameUrdu, FONT_SIZE_URDU);
+                try {
+                    String fileNameUrdu = folder + fileContentList.indexOf(lineList) + "_urdu.png";
+                    ImageIO.write(createUrduImage(lineList, FONT_SIZE_URDU, CONSTANT_1080, CONSTANT_1080, true), "png", new File(fileNameUrdu));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
             }else{
                 return "Text file format is not valid ! Correct first column.";
             }
@@ -67,7 +79,8 @@ public class TextToGraphicConverter {
         return "success";
     }
 
-    public List<List<String>> readData(String fileName) throws IOException {
+
+    private List<List<String>> readData(String fileName) throws IOException {
         int count = 0;
         List<List<String>> fileContentList = new ArrayList<>();
         ;
@@ -75,7 +88,9 @@ public class TextToGraphicConverter {
         try {
             Path path = Paths.get(fileName);
             BufferedReader br = Files.newBufferedReader(path);
+            actualFilename = path.getFileName().toString();
             System.out.println(br.ready());
+            System.out.println("actualFilename: "+actualFilename);
             String line = "";
             while ((line = br.readLine()) != null) {
                 lineList = Arrays.asList(line.split(","));
@@ -89,7 +104,14 @@ public class TextToGraphicConverter {
         return fileContentList;
     }
 
-    public void createEnglishImage(List<String> textList, String filename, int fontSize) throws IOException {
+    private String createFolder() {
+        String folder = "./"+actualFilename.substring(0,actualFilename.length()-4);
+        new File(folder).mkdir();
+        folder = folder + "/";
+        return folder;
+    }
+
+    private BufferedImage createEnglishImage(List<String> textList, int fontSize, int imageWidth, int imageHeight, boolean isHeaderFooter) throws IOException {
         BufferedImage image;
         Graphics2D g2d;
         if(null != backgroundImage && !backgroundImage.isEmpty()){
@@ -98,7 +120,7 @@ public class TextToGraphicConverter {
             g2d = intializeGraphics(g2d);
             g2d.drawImage(image, 0, 0, null);
         }else{
-            image = new BufferedImage(1080, 1080, BufferedImage.TYPE_INT_ARGB);
+            image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
             g2d = image.createGraphics();
             g2d = intializeGraphics(g2d);
             g2d.setColor(BACKGROUND_COLOR);
@@ -115,7 +137,7 @@ public class TextToGraphicConverter {
                     Font boldUnderline = new Font(ENGLISH_FONT_NAME, Font.BOLD, fontSize).deriveFont(fontAttributes);
                     g2d.setColor(FONT_COLOR);
                     g2d.setFont(boldUnderline);
-                    g2d.drawString(text, getXForCenteredString(g2d, boldUnderline, text, image), textList.indexOf(text) * (fontSize + 50) + 50);
+                    g2d.drawString(text, getXForCenteredString(g2d, boldUnderline, text, image), textList.indexOf(text) * (fontSize) + fontSize);
                 } else {
                     Map<TextAttribute, Integer> fontAttributes = new HashMap<TextAttribute, Integer>();
                     fontAttributes.put(TextAttribute.BACKGROUND, Paint.TRANSLUCENT);
@@ -126,24 +148,22 @@ public class TextToGraphicConverter {
                         int newFontSize = fontSize - 10;
                         Font newFont = new Font(ENGLISH_FONT_NAME, Font.ITALIC, newFontSize).deriveFont(fontAttributes);
                         g2d.setFont(newFont);
-                        g2d.drawString(text, getXForCenteredString(g2d, newFont, text, image), textList.indexOf(text) * (fontSize + 50) + 50);
+                        g2d.drawString(text, getXForCenteredString(g2d, newFont, text, image), textList.indexOf(text) * (fontSize + fontSize) );
                     } else {
-                        g2d.drawString(text, getXForCenteredString(g2d, font, text, image), textList.indexOf(text) * (fontSize + 50) + 50);
+                        g2d.drawString(text, getXForCenteredString(g2d, font, text, image), textList.indexOf(text) * (fontSize + fontSize) );
                     }
                 }
             }
         }
-        headerImagePrint(g2d);
-        footerImagePrint(g2d);
-        g2d.dispose();
-        try {
-            ImageIO.write(image, "png", new File(filename));
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(isHeaderFooter){
+            headerImagePrint(g2d);
+            footerImagePrint(g2d, image.getWidth(), image.getHeight());
         }
+        g2d.dispose();
+        return  image;
     }
 
-    public void createUrduImage(List<String> textList, String filename, int fontSize) throws IOException {
+    private BufferedImage createUrduImage(List<String> textList, int fontSize, int imageWidth, int imageHeight, boolean isHeaderFooter) throws IOException {
         BufferedImage image;
         Graphics2D g2d;
         if(null != backgroundImage && !backgroundImage.isEmpty()){
@@ -152,7 +172,7 @@ public class TextToGraphicConverter {
             g2d = intializeGraphics(g2d);
             g2d.drawImage(image, 0, 0, null);
         }else{
-            image = new BufferedImage(1080, 1080, BufferedImage.TYPE_INT_ARGB);
+            image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
             g2d = image.createGraphics();
             g2d = intializeGraphics(g2d);
             g2d.setColor(BACKGROUND_COLOR);
@@ -169,7 +189,7 @@ public class TextToGraphicConverter {
                     Font headingFont = new Font(URDU_FONT_NAME, Font.PLAIN, fontSize).deriveFont(fontAttributes);
                     g2d.setColor(FONT_COLOR);
                     g2d.setFont(headingFont);
-                    g2d.drawString(text, getXForCenteredString(g2d, headingFont, text, image), textList.indexOf(text) * (fontSize + 50) + 50);
+                    g2d.drawString(text, getXForCenteredString(g2d, headingFont, text, image), textList.indexOf(text) * (fontSize) + fontSize);
                 } else {
                     Map<TextAttribute, Integer> fontAttributes = new HashMap<TextAttribute, Integer>();
                     //fontAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
@@ -180,18 +200,45 @@ public class TextToGraphicConverter {
                         int newFontSize = fontSize - 10;
                         Font newFont = new Font(URDU_FONT_NAME, Font.PLAIN, newFontSize).deriveFont(fontAttributes);
                         g2d.setFont(newFont);
-                        g2d.drawString(text, getXForCenteredString(g2d, newFont, text, image), textList.indexOf(text) * (fontSize + 50) + 50);
+                        g2d.drawString(text, getXForCenteredString(g2d, newFont, text, image), textList.indexOf(text) * (fontSize + fontSize) );
                     } else {
-                        g2d.drawString(text, getXForCenteredString(g2d, font, text, image), textList.indexOf(text) * (fontSize + 50) + 50);
+                        g2d.drawString(text, getXForCenteredString(g2d, font, text, image), textList.indexOf(text) * (fontSize + fontSize));
                     }
                 }
 
             }
         }
-        headerImagePrint(g2d);
-        footerImagePrint(g2d);
+        if(isHeaderFooter){
+            headerImagePrint(g2d);
+            footerImagePrint(g2d,image.getWidth(), image.getHeight());
+        }
         g2d.dispose();
+        return image;
+    }
+
+    private void createCombinedImage(List<String> textList, String filename, int fontSize , int imageIndex) throws IOException {
+
+        List<String> englist = textList.subList(0, textList.indexOf("%"));
+        List<String> urdulist = textList.subList(textList.indexOf("%"), textList.size());
+        BufferedImage imgLeft = createEnglishImage(englist, FONT_SIZE_ENGLISH, 900, CONSTANT_1080, false);
+
+        BufferedImage imgRight = createUrduImage(urdulist, FONT_SIZE_URDU, 900, CONSTANT_1080, false);
+
+        BufferedImage image;
+        Graphics2D g2d;
+
         try {
+            image = new BufferedImage(imgLeft.getWidth()*2, imgLeft.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            g2d = image.createGraphics();
+            g2d = intializeGraphics(g2d);
+            g2d.setColor(BACKGROUND_COLOR);
+            g2d.fillRect(0, 0, image.getWidth(), image.getHeight());
+            g2d.drawImage(imgLeft, 0, 0, null);
+            g2d.drawImage(imgRight, imgLeft.getWidth(), 0, null);
+
+            headerImagePrint(g2d);
+            footerImagePrint(g2d,image.getWidth(), image.getHeight());
+
             ImageIO.write(image, "png", new File(filename));
         } catch (IOException e) {
             e.printStackTrace();
@@ -223,7 +270,7 @@ public class TextToGraphicConverter {
         if (null != headerImage && !headerImage.isEmpty()) {
             try {
                 BufferedImage imgTop = ImageIO.read(new File(headerImage));
-                g.drawImage(imgTop, 35, 35, null);
+                g.drawImage(imgTop, 20, 20, null);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -231,11 +278,11 @@ public class TextToGraphicConverter {
 
     }
 
-    private void footerImagePrint(Graphics2D g) {
+    private void footerImagePrint(Graphics2D g, int iWidth, int iHeight) {
         if (null != footerImage && !footerImage.isEmpty()) {
             try {
                 BufferedImage footImage = ImageIO.read(new File(footerImage));
-                g.drawImage(footImage, 20, 860, null);
+                g.drawImage(footImage, iWidth-footImage.getWidth()-20, iHeight-footImage.getHeight()-20, null);
             } catch (IOException e) {
                 e.printStackTrace();
             }
