@@ -1,5 +1,7 @@
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -164,7 +166,10 @@ public class TextToImageApp extends JFrame implements ActionListener {
             ftColor = c;
             infoArea.setText("Select Values And Click Submit");
         } else if (e.getSource() == fileButton) {
+            FileFilter filter = new FileNameExtensionFilter("Excel or CSV File", "csv", "xls", "xlsx");
             JFileChooser j = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+            j.setAcceptAllFileFilterUsed(false);
+            j.addChoosableFileFilter(filter);
             int r = j.showOpenDialog(null);
             fileLabel.setText(j.getSelectedFile().getAbsolutePath());
             fileName = j.getSelectedFile().getAbsolutePath();
