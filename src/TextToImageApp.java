@@ -22,7 +22,8 @@ public class TextToImageApp extends JFrame implements ActionListener {
     JComboBox urduTextSizeBox;
     JComboBox engFontListBox, urduFontListBox;
     JButton subButton;
-    Color bgColor, ftColor;
+    Color bgColor = Color.BLACK;
+    Color ftColor = Color.WHITE;
     FileChooser f1,f2,f3, f4;
     JButton fileButton,fileButton2,fileButton3,fileButton4 ;
     String fileName, backgroundImage, headerImage, footerImage;
@@ -35,6 +36,7 @@ public class TextToImageApp extends JFrame implements ActionListener {
         bgColorArea = new JTextArea();
         bgColorArea.setBounds(10, 13, 80, 25);
         bgColorArea.setEditable(false);
+        bgColorArea.setBackground(Color.black);
         bgColorButton = new JButton("Select image background color");
         bgColorButton.setBounds(110, 10, 300, 30);
         bgColorButton.setBackground(Color.gray);
@@ -47,6 +49,7 @@ public class TextToImageApp extends JFrame implements ActionListener {
         ftColorArea = new JTextArea();
         ftColorArea.setBounds(10, y, 80, 25);
         ftColorArea.setEditable(false);
+        ftColorArea.setBackground(Color.white);
         ftColorButton = new JButton("Select Text Font Color");
         ftColorButton.setBounds(110, y, 300, 30);
         ftColorButton.setBackground(Color.gray);
@@ -151,7 +154,7 @@ public class TextToImageApp extends JFrame implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == bgColorButton) {
-            Color c = JColorChooser.showDialog(this, "Choose Background Color", Color.CYAN);
+            Color c = JColorChooser.showDialog(this, "Choose Background Color", Color.GRAY);
             bgColorArea.setBackground(c);
             bgColor = c;
             infoArea.setText("Select Values And Click Submit");
@@ -228,4 +231,3 @@ public class TextToImageApp extends JFrame implements ActionListener {
         TextToImageApp cc = new TextToImageApp();
     }
 }
-
