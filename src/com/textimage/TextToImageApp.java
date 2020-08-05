@@ -1,3 +1,4 @@
+package com.textimage;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -26,7 +27,6 @@ public class TextToImageApp extends JFrame implements ActionListener {
     JButton subButton;
     Color bgColor = Color.BLACK;
     Color ftColor = Color.WHITE;
-    FileChooser f1,f2,f3, f4;
     JButton fileButton,fileButton2,fileButton3,fileButton4 ;
     String fileName, backgroundImage, headerImage, footerImage;
 
@@ -97,7 +97,6 @@ public class TextToImageApp extends JFrame implements ActionListener {
         frame.add(urduFontListBox);
 
         y=y+40;
-        f1 = new FileChooser();
         fileButton = new JButton("Source File");
         fileButton.setBounds(20, y, 200, 30);
         fileButton.addActionListener(this);
@@ -107,7 +106,6 @@ public class TextToImageApp extends JFrame implements ActionListener {
         frame.add(fileLabel);
 
         y=y+40;
-        f2 = new FileChooser();
         fileButton2 = new JButton("Background Image");
         fileButton2.setBounds(20, y, 200, 30);
         fileButton2.addActionListener(this);
@@ -117,7 +115,6 @@ public class TextToImageApp extends JFrame implements ActionListener {
         frame.add(fileLabel2);
 
         y=y+40;
-        f3 = new FileChooser();
         fileButton3 = new JButton("Header Image");
         fileButton3.setBounds(20, y, 200, 30);
         fileButton3.addActionListener(this);
@@ -127,7 +124,6 @@ public class TextToImageApp extends JFrame implements ActionListener {
         frame.add(fileLabel3);
 
         y=y+40;
-        f4 = new FileChooser();
         fileButton4 = new JButton("Footer Image");
         fileButton4.setBounds(20, y, 200, 30);
         fileButton4.addActionListener(this);

@@ -1,3 +1,5 @@
+package com.textimage;
+
 import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
