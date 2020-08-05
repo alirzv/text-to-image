@@ -1,10 +1,15 @@
+package com.textimage;
+
 import javax.imageio.ImageIO;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InvalidObjectException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -79,26 +84,21 @@ public class TextToGraphicConverter {
     }
 
 
-    private List<List<String>> readData(String fileName) throws IOException {
+    private List<List<String>> readData(String fileName) throws IOException, FileNotFoundException {
         int count = 0;
         List<List<String>> fileContentList = new ArrayList<>();
         List<String> lineList = new ArrayList<>();
-        try {
+
             Path path = Paths.get(fileName);
-            BufferedReader br = Files.newBufferedReader(path);
             actualFilename = path.getFileName().toString();
-            System.out.println(br.ready());
             System.out.println("actualFilename: "+actualFilename);
-            String line = "";
-            while ((line = br.readLine()) != null) {
-                lineList = Arrays.asList(line.split(","));
-                fileContentList.add(lineList);
-                System.out.println(line);
+            InputFileReader inputFileReader = new InputFileReader();
+
+            if(actualFilename.contains(".csv")){
+                fileContentList = inputFileReader.readCsvFile(path);
+            }else{
+                fileContentList = inputFileReader.readExcelFiles(path);
             }
-        } catch (InvalidPathException e) {
-            System.out.println("Exception!!");
-            e.printStackTrace();
-        }
         return fileContentList;
     }
 

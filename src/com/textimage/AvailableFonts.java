@@ -1,3 +1,5 @@
+package com.textimage;
+
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 
