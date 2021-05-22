@@ -1,4 +1,4 @@
-# text-to-image - A Java Swing software to convert text to images
+# Text to Image - A Java Swing software to convert text into images
 
 This application is for creating images from text. Suitable for posting poetry, text, quotes on Instagram, Facebook etc.
 
